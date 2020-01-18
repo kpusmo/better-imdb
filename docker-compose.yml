@@ -1,0 +1,54 @@
+version: '3.7'
+services:
+  database:
+    image: mariadb:10.3
+    ports:
+      - "33082:${TYPEORM_PORT}"
+    volumes:
+      - /var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=${TYPEORM_DATABASE}"
+      - "MYSQL_USER=${TYPEORM_USERNAME}"
+      - "MYSQL_PASSWORD=${TYPEORM_PASSWORD}"
+      - "MYSQL_ROOT_PASSWORD=${TYPEORM_PASSWORD}"
+    restart: always
+    networks:
+      - better-imdb-back
+
+  database-tests:
+    image: mariadb:10.3
+    ports:
+      - "33092:${TYPEORM_PORT}"
+    volumes:
+      - /var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=${TYPEORM_TEST_DATABASE}"
+      - "MYSQL_USER=${TYPEORM_TEST_USERNAME}"
+      - "MYSQL_PASSWORD=${TYPEORM_TEST_PASSWORD}"
+      - "MYSQL_ROOT_PASSWORD=${TYPEORM_TEST_PASSWORD}"
+    restart: always
+    networks:
+      - better-imdb-back
+
+  imdb-back:
+    build:
+      context: .
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    networks:
+      - better-imdb-back
+    ports:
+      - 3000:3000
+    command: ["docker/scripts/wait-for-it.sh", "database:3306", "-t", "20", "--", "docker/scripts/startup-dev.sh"]
+    restart: always
+    init: true
+
+networks:
+  better-imdb-back:
+    name: better-imdb-back
+
+volumes:
+  product-db:
