@@ -1,6 +1,8 @@
 import {Controller, Get, Req, UseGuards} from '@nestjs/common';
 import {ModuleRef} from '@nestjs/core';
 import {AuthGuard} from '@nestjs/passport';
+import {RolesGuard} from '../../authorization/guards/RoleGuard';
+import {Roles} from '../../authorization/decorators/RolesDecorator';
 
 @Controller('/users')
 export class UserController {
@@ -10,7 +12,8 @@ export class UserController {
     }
 
     @Get()
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles('ADMIN')
     async getList(@Req() request) {
         return request.user;
     }

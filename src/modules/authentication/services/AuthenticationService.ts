@@ -23,14 +23,22 @@ export class AuthenticationService {
     }
 
     async login(email, password): Promise<AuthResult | undefined> {
-        const user = await this.userService.findOne({where: {email}});
+        const user = await this.userService.findOne({
+            where: {
+                email,
+            },
+            relations: ['roles'],
+        });
         if (!user || !this.checkUserCredentials(password, user)) {
             return;
         }
         const refreshToken = await this.createRefreshToken(user.id);
         return {
-            expiresIn: this.configService.getNumber('JWT_LIFESPAN'),
-            accessToken: this.getAccessToken({userId: user.id}),
+            expiresIn: this.configService.getNumber('JWT_LIFESPAN') * 60,
+            accessToken: this.getAccessToken({
+                userId: user.id,
+                roles: user.roles,
+            }),
             refreshToken: refreshToken.token,
         };
     }
