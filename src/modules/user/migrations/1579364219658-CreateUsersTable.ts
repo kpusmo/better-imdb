@@ -5,7 +5,7 @@ export class CreateUsersTable1579364219658 implements MigrationInterface {
         await queryRunner.query(`
             create table users
             (
-                id int auto_increment,
+                id int unsigned auto_increment,
                 full_name varchar(255) not null,
                 email varchar(255) not null,
                 password varchar(255) not null,

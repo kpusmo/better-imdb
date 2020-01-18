@@ -4,7 +4,8 @@ import {User} from '../models/User';
 import {UserService} from '../services/UserService';
 import * as faker from 'faker';
 import {ConfigService} from '../../config/Services/ConfigService';
-import * as crypto from 'crypto';
+import {createHmac} from 'crypto';
+import {AuthenticationService} from '../../authentication/services/AuthenticationService';
 
 @Injectable()
 export class UserSeeder extends Seeder {
@@ -20,6 +21,7 @@ export class UserSeeder extends Seeder {
     constructor(
         private readonly userService: UserService,
         private readonly configService: ConfigService,
+        private readonly authenticationService: AuthenticationService,
     ) {
         super();
     }
@@ -35,9 +37,8 @@ export class UserSeeder extends Seeder {
                 });
             }
         }
-        const salt = this.configService.getString('APP_KEY');
         users = users.map(user => {
-           user.password = crypto.createHmac('sha512', salt).update(user.password).digest('hex');
+           user.password = this.authenticationService.hash(user.password);
            return user;
         });
         await this.userService.save(users);
