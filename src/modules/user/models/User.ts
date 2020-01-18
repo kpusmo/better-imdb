@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Role} from '../../authorization/models/Role';
 
 @Entity('users')
 export class User {
@@ -13,4 +14,13 @@ export class User {
 
     @Column()
     password: string;
+
+    @ManyToMany(type => Role)
+    @JoinTable({
+        name: 'user_roles',
+        joinColumn: {name: 'user_id'},
+        inverseJoinColumn: {name: 'role_id'},
+    })
+    roles: Role[];
+
 }
