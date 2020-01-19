@@ -1,7 +1,7 @@
 import {Body, Controller, HttpCode, Post, Put, Req, UseGuards} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {AuthenticationService} from '../services/AuthenticationService';
-import {RefreshTokenTransferObject} from '../transferObjects/RefreshTokenTransferObject';
+import {RefreshTokenTransferObject} from '../transfer-objects/RefreshTokenTransferObject';
 
 @Controller()
 export class AuthenticationController {

@@ -15,6 +15,7 @@ import AuthResult from '../../types/AuthResult';
 import {AuthGuardFactory, createUser} from '../../../../helpers/TestHelpers';
 import {AuthGuard} from '@nestjs/passport';
 import {addMinutes, isBefore, subDays} from 'date-fns';
+import {DatatableModule} from '../../../datatable/DatatableModule';
 
 describe('AuthenticationController', () => {
     let app: INestApplication;
@@ -37,6 +38,7 @@ describe('AuthenticationController', () => {
                     useClass: TestDatabaseConfigService,
                 }),
                 AuthenticationModule,
+                DatatableModule,
                 ConfigModule,
             ],
         })

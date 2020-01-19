@@ -16,7 +16,7 @@ export const createUser = (repository: Repository<User>, options?: Partial<User>
 };
 
 const fill = (entity, options) => {
-    for (const [field, value] of Object.entries(options)) {
+    for (const [field, value] of Object.entries(options || {})) {
         if (entity[field] !== undefined) {
             entity[field] = value;
         }
