@@ -18,7 +18,7 @@ services:
   database-tests:
     image: mariadb:10.3
     ports:
-      - "33092:${TYPEORM_PORT}"
+      - "${DOCKER_DATABASE_TEST_PORT}:${TYPEORM_PORT}"
     volumes:
       - /var/lib/mysql
     environment:

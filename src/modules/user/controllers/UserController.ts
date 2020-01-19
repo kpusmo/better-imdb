@@ -1,7 +1,7 @@
 import {Controller, Get, Req, UseGuards} from '@nestjs/common';
 import {ModuleRef} from '@nestjs/core';
 import {AuthGuard} from '@nestjs/passport';
-import {RolesGuard} from '../../authorization/guards/RoleGuard';
+import {RolesGuard} from '../../authorization/guards/RolesGuard';
 import {Roles} from '../../authorization/decorators/RolesDecorator';
 
 @Controller('/users')
