@@ -39,7 +39,7 @@ export class DatatableService<Entity> {
             return this;
         }
         for (const relation of this.dto.relations) {
-            this.queryBuilder.leftJoinAndSelect(relation, relation);
+            this.queryBuilder.leftJoinAndSelect(relation, this.getAliasFromPath(relation));
         }
         return this;
     }
@@ -73,5 +73,10 @@ export class DatatableService<Entity> {
 
     private getData(): Promise<Entity[]> {
         return this.queryBuilder.getMany();
+    }
+
+    private getAliasFromPath(relation: string): string {
+        const chunks = relation.split('.');
+        return chunks.pop();
     }
 }

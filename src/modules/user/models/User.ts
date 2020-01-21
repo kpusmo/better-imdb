@@ -1,4 +1,4 @@
-import {Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 import {Role} from '../../authorization/models/Role';
 
 @Entity('users')
@@ -12,8 +12,14 @@ export class User {
     @Column()
     email: string;
 
-    @Column()
+    @Column({select: false})
     password: string;
+
+    @CreateDateColumn({type: 'datetime'})
+    dateCreated: Date;
+
+    @UpdateDateColumn({type: 'datetime'})
+    dateModified: Date;
 
     @ManyToMany(type => Role)
     @JoinTable({
@@ -22,5 +28,4 @@ export class User {
         inverseJoinColumn: {name: 'role_id'},
     })
     roles: Role[];
-
 }

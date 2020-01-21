@@ -5,8 +5,9 @@ import DatabaseConfigService from '../../database/DatabaseConfigService';
 import {UserSeederModule} from '../user/UserSeederModule';
 import {DbCommand} from './commands/DbCommand';
 import {ConfigModule} from '../config/ConfigModule';
-import {RoleSeeder} from '../authorization/seeders/RoleSeeder';
 import {RoleSeedModule} from '../authorization/RoleSeedModule';
+import {DatatableModule} from '../datatable/DatatableModule';
+import {MovieSeederModule} from '../movie/MovieSeederModule';
 
 @Module({
     imports: [
@@ -17,6 +18,8 @@ import {RoleSeedModule} from '../authorization/RoleSeedModule';
         RoleSeedModule,
         BaseConsoleModule,
         ConfigModule,
+        DatatableModule,
+        MovieSeederModule,
     ],
     providers: [
         DbCommand,

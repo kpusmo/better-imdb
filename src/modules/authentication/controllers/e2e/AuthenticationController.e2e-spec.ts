@@ -12,7 +12,7 @@ import {ConfigService} from '../../../config/Services/ConfigService';
 import {JwtService} from '@nestjs/jwt';
 import {ConfigModule} from '../../../config/ConfigModule';
 import AuthResult from '../../types/AuthResult';
-import {AuthGuardFactory, createUser} from '../../../../helpers/TestHelpers';
+import {AuthGuardFactory, createUser} from '../../../../helpers/testHelpers';
 import {AuthGuard} from '@nestjs/passport';
 import {addMinutes, isBefore, subDays} from 'date-fns';
 import {DatatableModule} from '../../../datatable/DatatableModule';

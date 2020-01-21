@@ -23,9 +23,9 @@ export class RefreshToken {
     @Column()
     numberOfRefreshes: number;
 
-    @CreateDateColumn()
+    @CreateDateColumn({type: 'datetime'})
     dateCreated: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({type: 'datetime'})
     dateModified: Date;
 }

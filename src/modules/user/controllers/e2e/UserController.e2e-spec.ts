@@ -1,7 +1,7 @@
 import {INestApplication} from '@nestjs/common';
 import {Connection, Repository} from 'typeorm';
 import {User} from '../../models/User';
-import {AuthGuardFactory, createUser} from '../../../../helpers/TestHelpers';
+import {AuthGuardFactory, createMovie, createUser, transformDatesToStrings} from '../../../../helpers/testHelpers';
 import {Test} from '@nestjs/testing';
 import {getConnectionToken, getRepositoryToken, TypeOrmModule} from '@nestjs/typeorm';
 import TestDatabaseConfigService from '../../../../database/TestDatabaseConfigService';
@@ -12,12 +12,13 @@ import {DatatableModule} from '../../../datatable/DatatableModule';
 import * as request from 'supertest';
 import {Role} from '../../../authorization/models/Role';
 import {AuthenticationModule} from '../../../authentication/AuthenticationModule';
+import {range} from '../../../../helpers/helpers';
+import {Movie} from '../../../movie/models/Movie';
 
 describe('UserController', () => {
     let app: INestApplication;
     let connection: Connection;
     let userRepository: Repository<User>;
-    let roleRepository: Repository<Role>;
     const authGuardFactory = new AuthGuardFactory();
 
     beforeAll(async () => {
@@ -26,7 +27,7 @@ describe('UserController', () => {
                 TypeOrmModule.forRootAsync({
                     useClass: TestDatabaseConfigService,
                 }),
-                TypeOrmModule.forFeature([Role]),
+                TypeOrmModule.forFeature([Role, Movie]),
                 AuthenticationModule,
                 ConfigModule,
                 DatatableModule,
@@ -41,9 +42,6 @@ describe('UserController', () => {
 
         connection = module.get(getConnectionToken());
         userRepository = module.get(getRepositoryToken(User));
-        roleRepository = module.get(getRepositoryToken(Role));
-
-        authGuardFactory.setActivation(true);
     });
 
     afterAll(async () => {
@@ -51,6 +49,8 @@ describe('UserController', () => {
     });
 
     beforeEach(async () => {
+        authGuardFactory.setActivation(true);
+        authGuardFactory.setFaking(true);
         await connection.runMigrations();
     });
 
@@ -60,8 +60,18 @@ describe('UserController', () => {
     });
 
     describe('getList', () => {
-        it('throws unauthorized on user not being admin', async () => {
-            await createUser(userRepository);
+        it('throws unauthorized on not logged in user', async () => {
+            authGuardFactory.setFaking(false);
+            return request(app.getHttpServer())
+                .get('/users')
+                .expect(401)
+                .expect({
+                    statusCode: 401,
+                    error: 'Unauthorized',
+                });
+        });
+
+        it('throws forbidden on user not being admin', async () => {
             return request(app.getHttpServer())
                 .get('/users')
                 .expect(403)
@@ -73,31 +83,39 @@ describe('UserController', () => {
         });
 
         it('returns paginated, sorted data with relations', async () => {
-            const users = [];
-            users.push(await createUser(userRepository));
+            const users = await createUserStructure();
             authGuardFactory.setUser({
                 userId: users[0].id,
                 roles: [{
                     name: 'ADMIN',
                 }],
             });
-            for (const i of Array(5).keys()) {
-                users.push(await createUser(userRepository));
-            }
             const sortedUsers = users.sort((a, b) => b.id - a.id);
-            // todo relations
             return request(app.getHttpServer())
-                .get('/users?perPage=2&page=3&sort=id|desc')
+                .get('/users?perPage=2&page=3&sort=users.id|desc')
                 .expect(200)
-                .expect(res => {
-                    expect(res.body.perPage).toBe('2');
-                    expect(res.body.page).toBe('3');
-                    expect(res.body.total).toBe(6);
-                    expect(res.body.data).toEqual([
-                        sortedUsers[4],
-                        sortedUsers[5],
-                    ]);
+                .expect(async res => {
+                    delete sortedUsers[4].password;
+                    delete sortedUsers[5].password;
+                    expect(res.body).toEqual({
+                        perPage: '2',
+                        page: '3',
+                        total: 6,
+                        data: [
+                            transformDatesToStrings(sortedUsers[4]),
+                            transformDatesToStrings(sortedUsers[5]),
+                        ],
+                    });
                 });
         });
     });
+
+    const createUserStructure = async (): Promise<User[]> => {
+        const users = [];
+        users.push(await createUser(userRepository));
+        for (const i of range(5)) {
+            users.push(await createUser(userRepository));
+        }
+        return users;
+    };
 });

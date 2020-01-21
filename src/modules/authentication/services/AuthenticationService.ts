@@ -27,6 +27,7 @@ export class AuthenticationService {
             where: {
                 email,
             },
+            select: ['id', 'email', 'password'],
             relations: ['roles'],
         });
         if (!user || !this.checkUserCredentials(password, user)) {

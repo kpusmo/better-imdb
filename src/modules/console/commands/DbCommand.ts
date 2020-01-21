@@ -1,6 +1,7 @@
 import {Command, Console} from 'nestjs-console';
 import {UserSeeder} from '../../user/seeders/UserSeeder';
 import {RoleSeeder} from '../../authorization/seeders/RoleSeeder';
+import {MovieSeeder} from '../../movie/seeders/MovieSeeder';
 
 @Console({
     name: 'db',
@@ -10,6 +11,7 @@ export class DbCommand {
     constructor(
         private readonly userSeeder: UserSeeder,
         private readonly roleSeeder: RoleSeeder,
+        private readonly movieSeeder: MovieSeeder,
     ) {
     }
 
@@ -28,6 +30,7 @@ export class DbCommand {
         const includeFake = args && args.indexOf('fake') !== -1;
         await this.roleSeeder.seed(includeFake);
         await this.userSeeder.seed(includeFake);
+        await this.movieSeeder.seed(includeFake);
         process.exit(0);
     }
 }

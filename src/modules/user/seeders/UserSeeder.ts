@@ -8,6 +8,7 @@ import {AuthenticationService} from '../../authentication/services/Authenticatio
 import {Role} from '../../authorization/models/Role';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
+import {range} from '../../../helpers/helpers';
 
 @Injectable()
 export class UserSeeder extends Seeder {
@@ -65,7 +66,7 @@ export class UserSeeder extends Seeder {
 
     private static get fakeUsers() {
         const users = [];
-        for (const i of Array(50).keys()) {
+        for (const i of range(5)) {
             users.push({
                 email: faker.internet.email(),
                 fullName: faker.name.findName(),
