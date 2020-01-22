@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.5'
 services:
   database:
     image: mariadb:10.3
@@ -44,11 +44,9 @@ services:
       - 3000:3000
     command: ["docker/scripts/wait-for-it.sh", "database:3306", "-t", "20", "--", "docker/scripts/startup-dev.sh"]
     restart: always
-    init: true
 
 networks:
   better-imdb-back:
-    name: better-imdb-back
 
 volumes:
   product-db:

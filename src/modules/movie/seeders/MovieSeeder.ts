@@ -11,9 +11,9 @@ import {randomInRange, range} from '../../../helpers/helpers';
 
 @Injectable()
 export class MovieSeeder extends Seeder {
-    private static MOVIE_COUNT = 5;
-    private static STAR_COUNT = 5;
-    private static MOVIE_STAR_COUNT = 5;
+    private static MOVIE_COUNT = 10;
+    private static STAR_COUNT = 20;
+    private static MOVIE_STAR_COUNT = 8;
 
     constructor(
         @InjectRepository(Movie) private readonly movieRepository: Repository<Movie>,

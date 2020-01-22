@@ -4,7 +4,7 @@ import {Movie} from './models/Movie';
 import {Star} from './models/Star';
 import {MovieStar} from './models/MovieStar';
 import {MovieController} from './controllers/MovieController';
-import {MovieService} from './MovieService';
+import {MovieService} from './services/MovieService';
 
 @Module({
     imports: [

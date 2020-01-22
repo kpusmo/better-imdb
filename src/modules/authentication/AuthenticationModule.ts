@@ -10,17 +10,18 @@ import {LocalStrategy} from './strategies/LocalStrategy';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {RefreshToken} from './models/RefreshToken';
 
-const configService = new ConfigService('.env');
-
 @Global()
 @Module({
     imports: [
         UserModule,
-        JwtModule.register({
-            secret: configService.getString('JWT_SECRET'),
-            signOptions: {
-                expiresIn: configService.getString('JWT_LIFESPAN'),
-            },
+        JwtModule.registerAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                secret: configService.getString('JWT_SECRET'),
+                signOptions: {
+                    expiresIn: configService.getString('JWT_LIFESPAN'),
+                },
+            }),
         }),
         TypeOrmModule.forFeature([RefreshToken]),
         PassportModule,

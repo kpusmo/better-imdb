@@ -4,7 +4,7 @@ import {GetMovieListTransferObject} from '../transfer-objects/GetMovieListTransf
 import {Movie} from '../models/Movie';
 import {AuthGuard} from '@nestjs/passport';
 import {GetMovieTransferObject} from '../transfer-objects/GetMovieTransferObject';
-import {MovieService} from '../MovieService';
+import {MovieService} from '../services/MovieService';
 import {MovieTransformer} from '../interceptors/MovieTransformer';
 import {MovieListTransformer} from '../interceptors/MovieListTransformer';
 

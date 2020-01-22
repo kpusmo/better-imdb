@@ -29,17 +29,6 @@ export const createMovie = (repository: Repository<Movie>, options?: Partial<Mov
     return repository.save(movie);
 };
 
-export const transformDatesToStrings = object => {
-    for (const [field, value] of Object.entries(object)) {
-        if (value instanceof Date) {
-            object[field] = value.toJSON();
-        } else if (typeof value === 'object' && !!value) {
-            object[field] = transformDatesToStrings(value);
-        }
-    }
-    return object;
-};
-
 const fill = (entity, options) => {
     for (const [field, value] of Object.entries(options || {})) {
         if (entity[field] !== undefined) {

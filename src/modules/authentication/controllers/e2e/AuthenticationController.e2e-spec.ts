@@ -55,8 +55,6 @@ describe('AuthenticationController', () => {
         refreshTokenRepository = module.get(getRepositoryToken(RefreshToken));
         authenticationService = module.get(AuthenticationService);
         configService = module.get(ConfigService);
-
-        authGuardFactory.setFaking(false);
     });
 
     afterAll(async () => {
@@ -64,23 +62,24 @@ describe('AuthenticationController', () => {
     });
 
     beforeEach(async () => {
+        authGuardFactory.setFaking(false);
         await connection.runMigrations();
     });
 
     afterEach(async () => {
         // clear database after each test
         await connection.dropDatabase();
-        authGuardFactory.setFaking(false);
     });
 
     describe('login', () => {
         it('logs in valid user', async () => {
-            const user = await createUser(userRepository, {password: 'test'}, pass => authenticationService.hash(pass));
+            const password = 'test';
+            const user = await createUser(userRepository, {password}, pass => authenticationService.hash(pass));
             return request(app.getHttpServer())
                 .post('/login')
                 .send({
                     email: user.email,
-                    password: 'test',
+                    password,
                 })
                 .expect(200)
                 .expect(async res => {
@@ -193,16 +192,19 @@ describe('AuthenticationController', () => {
                 userId: user.id + 15, // not owner of token
             });
 
-            authGuardFactory.setFaking(true);
-            authGuardFactory.setActivation(true);
-            authGuardFactory.setUser({
-                userId: user.id + 15, // not owner of token
-            });
-
             return request(app.getHttpServer())
                 .put('/refresh-token')
                 .send({
                     token: authResult.refreshToken,
+                })
+                .expect(401);
+        });
+
+        it('throws unauthorized on not logged user', async () => {
+            return request(app.getHttpServer())
+                .put('/refresh-token')
+                .send({
+                    token: 'some token',
                 })
                 .expect(401);
         });
@@ -211,7 +213,6 @@ describe('AuthenticationController', () => {
     const createAndLogUserIn = async () => {
         const password = 'test';
         const user = await createUser(userRepository, {password}, pass => authenticationService.hash(pass));
-        // login to create refreshToken
         const authResult: AuthResult = await authenticationService.login(user.email, password);
         return {user, authResult};
     };

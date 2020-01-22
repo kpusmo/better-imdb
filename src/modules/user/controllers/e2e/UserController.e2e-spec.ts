@@ -1,7 +1,7 @@
 import {INestApplication} from '@nestjs/common';
 import {Connection, Repository} from 'typeorm';
 import {User} from '../../models/User';
-import {AuthGuardFactory, createMovie, createUser, transformDatesToStrings} from '../../../../helpers/testHelpers';
+import {AuthGuardFactory, createUser} from '../../../../helpers/testHelpers';
 import {Test} from '@nestjs/testing';
 import {getConnectionToken, getRepositoryToken, TypeOrmModule} from '@nestjs/typeorm';
 import TestDatabaseConfigService from '../../../../database/TestDatabaseConfigService';
@@ -10,7 +10,6 @@ import {AuthGuard} from '@nestjs/passport';
 import {UserModule} from '../../UserModule';
 import {DatatableModule} from '../../../datatable/DatatableModule';
 import * as request from 'supertest';
-import {Role} from '../../../authorization/models/Role';
 import {AuthenticationModule} from '../../../authentication/AuthenticationModule';
 import {range} from '../../../../helpers/helpers';
 import {Movie} from '../../../movie/models/Movie';
@@ -27,7 +26,7 @@ describe('UserController', () => {
                 TypeOrmModule.forRootAsync({
                     useClass: TestDatabaseConfigService,
                 }),
-                TypeOrmModule.forFeature([Role, Movie]),
+                TypeOrmModule.forFeature([Movie]),
                 AuthenticationModule,
                 ConfigModule,
                 DatatableModule,
@@ -82,7 +81,7 @@ describe('UserController', () => {
                 });
         });
 
-        it('returns paginated, sorted data with relations', async () => {
+        it('returns paginated, sorted data', async () => {
             const users = await createUserStructure();
             authGuardFactory.setUser({
                 userId: users[0].id,
@@ -102,9 +101,33 @@ describe('UserController', () => {
                         page: '3',
                         total: 6,
                         data: [
-                            transformDatesToStrings(sortedUsers[4]),
-                            transformDatesToStrings(sortedUsers[5]),
+                            JSON.parse(JSON.stringify(sortedUsers[4])),
+                            JSON.parse(JSON.stringify(sortedUsers[5])),
                         ],
+                    });
+                });
+        });
+
+        it('returns all users when perPage is ALL', async () => {
+            const users = await createUserStructure();
+            authGuardFactory.setUser({
+                userId: users[0].id,
+                roles: [{
+                    name: 'ADMIN',
+                }],
+            });
+            return request(app.getHttpServer())
+                .get('/users?perPage=ALL')
+                .expect(200)
+                .expect(async res => {
+                    const mappedUsers = users.map(user => {
+                        delete user.password;
+                        return user;
+                    });
+                    expect(res.body).toEqual({
+                        perPage: 'ALL',
+                        total: 6,
+                        data: JSON.parse(JSON.stringify(mappedUsers)),
                     });
                 });
         });

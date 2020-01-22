@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {FindOneOptions, Repository} from 'typeorm';
-import {Movie} from './models/Movie';
+import {Movie} from '../models/Movie';
 import {InjectRepository} from '@nestjs/typeorm';
 
 @Injectable()

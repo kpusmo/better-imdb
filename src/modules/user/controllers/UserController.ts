@@ -1,7 +1,7 @@
 import {Controller, Get, Query, Req, UseGuards} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {RolesGuard} from '../../authorization/guards/RolesGuard';
-import {Roles} from '../../authorization/decorators/RolesDecorator';
+import {Roles} from '../../authorization/decorators/Roles';
 import {DatatableService} from '../../datatable/services/DatatableService';
 import {User} from '../models/User';
 import {GetUserListTransferObject} from '../transfer-objects/GetUserListTransferObject';
