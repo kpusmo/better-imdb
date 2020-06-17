@@ -2,6 +2,6 @@ import {DatatableTransferObject} from '../../datatable/transfer-objects/Datatabl
 import {SortValuesIn} from '../../datatable/decorators/SortValuesDecorator';
 
 export class GetMovieListTransferObject extends DatatableTransferObject {
-    @SortValuesIn(['title', 'premiere_date', 'metascore'])
+    @SortValuesIn(['name', 'premiere_date', 'metascore'])
     sort: string;
 }

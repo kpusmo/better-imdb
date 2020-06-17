@@ -160,7 +160,7 @@ describe('MovieController', () => {
         const movies = [];
         for (const i of range(n)) {
             const movie = await createMovie(movieRepository);
-            movie.starring = [await createMovieStar(movie)];
+            movie.starring = [await createMovieStar(movie), await createMovieStar(movie)];
             movies.push(movie);
         }
         return movies;

@@ -23,13 +23,7 @@ export class AuthenticationService {
     }
 
     async login(email, password): Promise<AuthResult | undefined> {
-        const user = await this.userService.findOne({
-            where: {
-                email,
-            },
-            select: ['id', 'email', 'password'],
-            relations: ['roles'],
-        });
+        const user = await this.userService.getLoginDataByEmail(email);
         if (!user || !this.checkUserCredentials(password, user)) {
             return;
         }

@@ -7,11 +7,12 @@ import {GetMovieTransferObject} from '../transfer-objects/GetMovieTransferObject
 import {MovieService} from '../services/MovieService';
 import {MovieTransformer} from '../interceptors/MovieTransformer';
 import {MovieListTransformer} from '../interceptors/MovieListTransformer';
+import {MovieListService} from '../services/MovieListService';
 
 @Controller('movies')
 export class MovieController {
     constructor(
-        private readonly datatableService: DatatableService<Movie>,
+        private readonly movieListService: MovieListService,
         private readonly movieService: MovieService,
     ) {
     }
@@ -20,24 +21,13 @@ export class MovieController {
     @UseInterceptors(MovieListTransformer)
     @UseGuards(AuthGuard('jwt'))
     async getList(@Query() dto: GetMovieListTransferObject) {
-        dto.table = 'movies';
-        dto.relations = ['movies.starring', 'starring.star'];
-        return await this.datatableService.get(dto);
+        return this.movieListService.getList(dto);
     }
 
     @Get(':movieId')
     @UseInterceptors(MovieTransformer)
     @UseGuards(AuthGuard('jwt'))
     async get(@Param() dto: GetMovieTransferObject) {
-        const movie = await this.movieService.findOneMovie({
-            where: {
-                id: dto.movieId,
-            },
-            relations: ['starring', 'starring.star'],
-        });
-        if (!movie) {
-            throw new NotFoundException('Movie not found');
-        }
-        return movie;
+        return await this.movieService.findMovieById(dto.movieId);
     }
 }

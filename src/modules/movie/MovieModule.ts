@@ -5,12 +5,13 @@ import {Star} from './models/Star';
 import {MovieStar} from './models/MovieStar';
 import {MovieController} from './controllers/MovieController';
 import {MovieService} from './services/MovieService';
+import {MovieListService} from './services/MovieListService';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Movie, Star, MovieStar]),
     ],
-    providers: [MovieService],
+    providers: [MovieService, MovieListService],
     controllers: [
         MovieController,
     ],

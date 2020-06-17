@@ -1,7 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {Seeder} from '../../../abstracts/Seeder';
 import {User} from '../models/User';
-import {UserService} from '../services/UserService';
 import * as faker from 'faker';
 import {ConfigService} from '../../config/Services/ConfigService';
 import {AuthenticationService} from '../../authentication/services/AuthenticationService';
@@ -17,7 +16,7 @@ export class UserSeeder extends Seeder {
             id: 1,
             fullName: 'Admin Admin',
             email: 'admin@admin.com',
-            password: 'admin',
+            password: 'test',
             roles: [
                 {
                     name: 'ADMIN',
@@ -27,10 +26,10 @@ export class UserSeeder extends Seeder {
     ];
 
     constructor(
-        private readonly userService: UserService,
         private readonly configService: ConfigService,
         private readonly authenticationService: AuthenticationService,
         @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
+        @InjectRepository(User) private readonly userRepository: Repository<User>,
     ) {
         super();
     }
@@ -41,7 +40,7 @@ export class UserSeeder extends Seeder {
             users = users.concat(UserSeeder.fakeUsers);
         }
         users = await this.mapUsers(users);
-        await this.userService.save(users);
+        await this.userRepository.save(users);
     }
 
     private async mapUsers(users: Array<Partial<User>>) {

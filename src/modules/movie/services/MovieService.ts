@@ -1,5 +1,5 @@
-import {Injectable} from '@nestjs/common';
-import {FindOneOptions, Repository} from 'typeorm';
+import {Injectable, NotFoundException} from '@nestjs/common';
+import {Repository} from 'typeorm';
 import {Movie} from '../models/Movie';
 import {InjectRepository} from '@nestjs/typeorm';
 
@@ -10,7 +10,16 @@ export class MovieService {
     ) {
     }
 
-    findOneMovie(options: FindOneOptions<Movie>): Promise<Movie | undefined> {
-        return this.movieRepository.findOne(options);
+    async findMovieById(id: number): Promise<Movie> {
+        const movie = await this.movieRepository.findOne({
+            where: {
+                id,
+            },
+            relations: ['starring', 'starring.star'],
+        });
+        if (!movie) {
+            throw new NotFoundException('Movie not found');
+        }
+        return movie;
     }
 }

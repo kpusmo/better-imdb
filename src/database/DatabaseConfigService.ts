@@ -10,7 +10,7 @@ export default class DatabaseConfigService implements TypeOrmOptionsFactory {
 
     createTypeOrmOptions(connectionName?: string): TypeOrmModuleOptions {
         return {
-            type: 'mariadb' as 'mariadb',
+            type: 'mariadb',
             host: this.configService.getString('TYPEORM_HOST'),
             port: this.configService.getNumber('TYPEORM_PORT'),
             username: this.configService.getString('TYPEORM_USERNAME'),

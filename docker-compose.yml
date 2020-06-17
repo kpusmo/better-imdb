@@ -3,7 +3,7 @@ services:
   database:
     image: mariadb:10.3
     ports:
-      - "33082:${TYPEORM_PORT}"
+      - "${DOCKER_DATABASE_PORT:-33060}:${TYPEORM_PORT}"
     volumes:
       - /var/lib/mysql
     environment:
@@ -18,7 +18,7 @@ services:
   database-tests:
     image: mariadb:10.3
     ports:
-      - "${DOCKER_DATABASE_TEST_PORT}:${TYPEORM_PORT}"
+      - "${DOCKER_DATABASE_TEST_PORT:-33061}:${TYPEORM_PORT}"
     volumes:
       - /var/lib/mysql
     environment:
@@ -41,7 +41,7 @@ services:
     networks:
       - better-imdb-back
     ports:
-      - 3000:3000
+      - "${DOCKER_API_PORT:-3000}:3000"
     command: ["docker/scripts/wait-for-it.sh", "database:3306", "-t", "20", "--", "docker/scripts/startup-dev.sh"]
     restart: always
 

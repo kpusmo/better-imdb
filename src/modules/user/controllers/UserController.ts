@@ -2,14 +2,13 @@ import {Controller, Get, Query, Req, UseGuards} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {RolesGuard} from '../../authorization/guards/RolesGuard';
 import {Roles} from '../../authorization/decorators/Roles';
-import {DatatableService} from '../../datatable/services/DatatableService';
-import {User} from '../models/User';
 import {GetUserListTransferObject} from '../transfer-objects/GetUserListTransferObject';
+import {UserListService} from '../services/UserListService';
 
 @Controller('/users')
 export class UserController {
     constructor(
-        private readonly datatableService: DatatableService<User>,
+        private readonly userListService: UserListService,
     ) {
     }
 
@@ -17,7 +16,6 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles('ADMIN')
     async getList(@Query() dto: GetUserListTransferObject, @Req() request) {
-        dto.table = 'users';
-        return await this.datatableService.get(dto);
+        return await this.userListService.getList(dto);
     }
 }

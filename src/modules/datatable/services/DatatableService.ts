@@ -63,11 +63,28 @@ export class DatatableService<Entity> {
 
     private buildPagination(): DatatableService<Entity> {
         const perPageAsNumber = parseInt(this.dto.perPage as string, 10);
-        if (Number.isInteger(perPageAsNumber)) {
-            this.queryBuilder
-                .limit(perPageAsNumber)
-                .offset((this.dto.page - 1) * perPageAsNumber); // page is indexed from 1 in this.dto and OFFSET is indexed from 0 in SQL
+        if (!Number.isInteger(perPageAsNumber)) {
+            return this;
         }
+        // this is workaround for TypeORM bug. refer to https://github.com/typeorm/typeorm/issues/5670
+        this.queryBuilder.select(`${this.dto.table}.id`).distinct(true);
+        this.queryBuilder.limit(perPageAsNumber);
+        if (+this.dto.page) {
+            // page is indexed from 1 in this.dto and OFFSET is indexed from 0 in MariaDB
+            const offset = (this.dto.page - 1) * perPageAsNumber;
+            this.queryBuilder.offset(offset);
+        }
+        const innerSql = `(${this.queryBuilder.getSql()})`;
+        this.queryBuilder = this
+            .connection
+            .createQueryBuilder()
+            .select(this.dto.table)
+            .from(this.dto.table, this.dto.table)
+            .innerJoin(innerSql, 'filteredEntities', `filteredEntities.${this.dto.table}_id = ${this.dto.table}.id`) as SelectQueryBuilder<Entity>;
+        this
+            .buildRelations()
+            .buildSort();
+
         return this;
     }
 
